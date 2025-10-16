@@ -77,7 +77,6 @@ Para garantir a observabilidade e a capacidade de auditoria, a seguinte estrutur
 
 O código Terraform está organizado de forma modular para promover a reutilização e a fácil manutenção.
 
-.
 ├── main.tf           # Arquivo principal que orquestra os módulos
 ├── variables.tf      # Variáveis de entrada para customização
 ├── outputs.tf        # Saídas da infraestrutura (ex: DNS do ALB)
@@ -102,29 +101,34 @@ O código Terraform está organizado de forma modular para promover a reutiliza�
 
 Clonar o repositório:
 
-```git clone [repositorio]
+```
+git clone [repositorio]
 cd [nome-do-repositorio]
 ```
 Inicializar o Terraform: Este comando inicializa o diretório de trabalho e baixa os provedores necessários.
 
-```terraform init
+```
+terraform init
 ```
 
 Planejar a implantação: O Terraform irá gerar um plano de execução mostrando quais recursos serão criados. É altamente recomendado revisar este plano antes de aplicar.
 
-```terraform plan
+```
+terraform plan
 ```
 
 Aplicar as configurações: Este comando provisionará todos os recursos definidos nos arquivos .tf.
 
-```terraform apply
+```
+terraform apply
 ```
 
 Digite yes quando solicitado para confirmar a criação da infraestrutura.
 
 Destruir a infraestrutura: Para remover todos os recursos criados por este projeto e evitar custos, execute:
 
-```terraform destroy
+```
+terraform destroy
 ```
 
 ## Entregáveis Adicionais

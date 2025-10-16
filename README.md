@@ -77,15 +77,18 @@ Para garantir a observabilidade e a capacidade de auditoria, a seguinte estrutur
 
 O código Terraform está organizado de forma modular para promover a reutilização e a fácil manutenção.
 
-├── main.tf           # Arquivo principal que orquestra os módulos
-├── variables.tf      # Variáveis de entrada para customização
-├── outputs.tf        # Saídas da infraestrutura (ex: DNS do ALB)
-├── network.tf        # Módulo de rede (VPCs, Sub-redes, Gateways, Peering)
-├── instances.tf      # Módulo das instâncias EC2 e Target Groups
-├── s3.tf             # Módulo do bucket S3 para conteúdo estático
-├── cloudfront.tf     # Módulo da distribuição CloudFront com OAC
+```
+.
+├── main.tf           # Orquestra os módulos
+├── variables.tf      # Variáveis de entrada
+├── outputs.tf        # Saídas da infraestrutura
+├── network.tf        # Módulo de rede (VPCs, Sub-redes, etc.)
+├── instances.tf      # Módulo das instâncias EC2
+├── s3.tf             # Módulo do bucket S3
+├── cloudfront.tf     # Módulo da distribuição CloudFront
 ├── endpoints.tf      # Módulo dos VPC Endpoints
-└── monitoring.tf     # Módulo de monitoramento (CloudWatch Logs)
+└── monitoring.tf     # Módulo de monitoramento (CloudWatch)
+```
 
 ## Como Implantar a Infraestrutura
 

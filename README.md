@@ -105,8 +105,8 @@ O código Terraform está organizado de forma modular para promover a reutiliza�
 Clonar o repositório:
 
 ```
-git clone [repositorio]
-cd [nome-do-repositorio]
+git clone https://github.com/haranakag/Casino-Online.git
+cd Casino-Online
 ```
 Inicializar o Terraform: Este comando inicializa o diretório de trabalho e baixa os provedores necessários.
 

@@ -1,36 +1,37 @@
-# Notas e Premissas Usadas na Estimativa
+# Notas y suposiciones utilizadas en la estimación
 
-Para chegar a esses números, fiz algumas suposições baseadas em um cenário de aplicação com tráfego moderado e alta disponibilidade, conforme o desafio:
+Para obtener estas cifras, realicé algunas suposiciones basadas en un escenario de aplicación con tráfico moderado y alta disponibilidad, según el desafío:
 
-Região: Todos os preços são para a região ca-central-1 (Canadá), como especificado no documento.
+Región: Todos los precios corresponden a la región ca-central-1 (Canadá), como se especifica en el documento.
 
-EC2: O desafio pede 4 aplicações (frontsite, backoffice, webapi, gameapi) em alta disponibilidade. Assumi que isso significa 2 instâncias por aplicação (uma em cada uma das 2 Zonas de Disponibilidade), totalizando 8 instâncias. O tipo t3.medium foi escolhido como um ponto de partida balanceado.
+EC2: El desafío requiere 4 aplicaciones (frontsite, backoffice, webapi, gameapi) en alta disponibilidad. Asumí que esto significa 2 instancias por aplicación (una en cada una de las 2 zonas de disponibilidad), para un total de 8 instancias. Se eligió el tipo t3.medium como punto de partida equilibrado.
 
-RDS: Utilizei uma instância db.t3.medium em modo Multi-AZ para alta disponibilidade, com 100 GB de armazenamento SSD (gp3).
+RDS: Utilicé una instancia db.t3.medium en modo Multi-AZ para alta disponibilidad, con 100 GB de almacenamiento SSD (gp3).
 
-NAT Gateway: O custo inclui a taxa por hora e uma estimativa de 50 GB de dados processados para atualizações de sistema e chamadas a APIs externas.
+Puerta de enlace NAT: El costo incluye la tarifa por hora y un estimado de 50 GB de datos procesados ​​para actualizaciones del sistema y llamadas API externas.
 
-CloudFront & S3: A maior parte do custo aqui vem da transferência de dados do CloudFront para os usuários. Estimei um volume considerável (1 Terabyte) para uma aplicação como um casino online. O custo de armazenamento no S3 é relativamente baixo.
+CloudFront y S3: La mayor parte del costo proviene de la transferencia de datos desde CloudFront a los usuarios. Calculé un volumen considerable (1 Terabyte) para una aplicación como la de un casino en línea. El costo del almacenamiento en S3 es relativamente bajo.
 
-VPC Endpoints: O Endpoint do tipo Gateway para o S3 é gratuito. O custo vem do Endpoint do tipo Interface para o Secrets Manager, que é cobrado por hora e por AZ.
+Puntos de conexión de VPC: El punto de conexión de puerta de enlace para S3 es gratuito. El costo proviene del punto de conexión de interfaz para Secrets Manager, que se factura por hora y por AZ.
 
-Serviços Gratuitos ou de Baixo Custo: Muitos dos recursos na sua lista não têm um custo direto significativo ou estão incluídos no "Free Tier" da AWS. Isso inclui:
+Servicios gratuitos o de bajo costo: Muchas de las funciones de su lista no tienen un costo directo significativo o están incluidas en la capa gratuita de AWS. Esto incluye:
 
-VPC, Sub-redes, Route Tables, Internet Gateway, VPC Peering.
+VPC, subredes, tablas de rutas, puerta de enlace de Internet, emparejamiento de VPC.
 
-Security Groups, IAM Roles, S3 Bucket Policies, CloudFront OAC.
+Grupos de seguridad, roles de IAM, políticas de bucket de S3, OAC de CloudFront.
 
-O custo dos Target Groups e Listeners está embutido no custo do ALB.
+El costo de los grupos objetivo y los oyentes está incluido en el costo del ALB.
 
-Para otimizar esses custos no futuro, você poderia considerar o uso de Instâncias Reservadas ou Savings Plans para EC2 e RDS, o que pode gerar descontos de até 60-70% em comparação com os preços sob demanda usados nesta estimativa.
+Para optimizar estos costos en el futuro, podría considerar usar Instancias Reservadas o Planes de Ahorro para EC2 y RDS, que pueden ofrecer descuentos de hasta un 60-70% en comparación con los precios bajo demanda utilizados en esta estimación.
 
-| Serviço | Descrição | Estimado Mensual (USD) |
+| Servicio | Descripción | Costo Mensual Estimado (USD) |
 | :--- | :--- | :--- |
-| **EC2** | 8 instâncias (`t3.medium`) em alta disponibilidade (2 por aplicação em 2 AZs) | ~$292.00 |
-| **RDS** | 1 instância (`db.t3.medium`) Multi-AZ com 100 GB de storage | ~$159.00 |
-| **ALB** | 1 balanceador ativo, incluindo processamento de dados (LCUs) | ~$25.00 |
-| **NAT Gateway** | 1 instância com Elastic IP + processamento de 50 GB de dados | ~$39.00 |
-| **S3 + CloudFront** | 50 GB em S3 + 1 TB de tráfego de saída do CloudFront | ~$90.00 |
+| **EC2** | 8 instancias (`t3.medium`) en alta disponibilidad (2 por aplicación en 2 AZ) | ~$292.00 |
+| **RDS** | 1 instancia (`db.t3.medium`) Multi-AZ con 100 GB de almacenamiento | ~$159.00 |
+| **ALB** | 1 balanceador de carga activo, incluyendo procesamiento de datos (LCU) | ~$25.00 |
+| **NAT Gateway** | 1 instancia con IP elástica y procesamiento de 50 GB de datos | ~$39.00 |
+| **S3 + CloudFront** | 50 GB en S3 + 1 TB de tráfico de salida de CloudFront | ~$90.00 |
 | **VPC Endpoints** | 1 Endpoint de Interface para Secrets Manager em 2 AZs (S3 é gratuito) | ~$18.00 |
 | **CloudWatch Logs** | Ingestão e armazenamento de aproximadamente 10 GB de logs mensais | ~$5.00 |
 | **Total Estimado** | | **~$628.00** |
+

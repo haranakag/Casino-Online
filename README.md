@@ -1,146 +1,146 @@
-# Infraestrutura AWS para Casino Online com Terraform
+# Infraestructura de AWS para Casinos Online con Terraform
 
-Este repositório contém o código Terraform para provisionar a infraestrutura completa de uma "Operação de Casino Online" na AWS. O projeto foi desenvolvido como parte de um desafio técnico para Engenheiro Cloud , com foco na aplicação de boas práticas de segurança, escalabilidade, alta disponibilidade e organização de código (Infrastructure as Code).
+Este repositorio contiene el código de Terraform para aprovisionar la infraestructura completa para una "Operación de Casino Online" en AWS. El proyecto se desarrolló como parte de un desafío técnico para un ingeniero de la nube, centrándose en la aplicación de las mejores prácticas de seguridad, escalabilidad, alta disponibilidad y organización del código (Infraestructura como Código).
 
-## Visão Geral da Arquitetura
+## Descripción arquitectónica
 
 ![Arquitetura](Reto%20Ingeniero%20Cloud.drawio.png)
-A infraestrutura foi projetada para ser robusta e segura, utilizando uma arquitetura de microserviços distribuída em múltiplas Zonas de Disponibilidade (AZs) para garantir alta disponibilidade.
+La infraestructura está diseñada para ser robusta y segura, utilizando una arquitectura de microservicios distribuida en múltiples zonas de disponibilidad (AZ) para garantizar una alta disponibilidad.
 
-### Os componentes principais da arquitetura são:
+### Los componentes principales de la arquitectura son:
 
-**Região da AWS:** ca-central-1 (Canadá).
+**Región de AWS:** ca-central-1 (Canadá).
 
-**Rede (VPC):** Duas VPCs conectadas via VPC Peering:
+**Red (VPC):** Dos VPC conectadas mediante peering de VPC:
 
-**VPC Principal:** Hospeda as aplicações, APIs e serviços públicos.
+**VPC principal:** Aloja aplicaciones, API y servicios públicos.
 
-**VPC Secundária:** Dedicada à bodega de dados (banco de dados histórico).
+**VPC secundaria:** Dedicada al almacén de datos (base de datos histórica).
 
-**Sub-redes:** Sub-redes públicas e privadas distribuídas em pelo menos duas AZs para alta disponibilidade.
+**Subredes:** Subredes públicas y privadas distribuidas en al menos dos zonas de disponibilidad (AZ) para alta disponibilidad.
 
 ### Gateways:
 
-**Internet Gateway (IGW):** Para permitir acesso de e para a internet na VPC principal.
+Puerta de enlace de Internet (IGW): Permite el acceso a y desde internet en la VPC principal.
 
-**NAT Gateway com Elastic IP:** Para permitir que instâncias em sub-redes privadas acessem a internet de forma segura para atualizações e patches.
+Puerta de enlace NAT con IP elástica: Permite que las instancias en subredes privadas accedan de forma segura a internet para obtener actualizaciones y parches.
 
-### Balanceamento de Carga:
+Balanceo de carga:
 
-**Application Load Balancer (ALB):** Gerencia todo o tráfego de entrada da internet, distribuindo-o para os servidores de aplicação. Utiliza um certificado SSL/TLS do AWS Certificate Manager (ACM).
+Balanceador de carga de aplicaciones (ALB): Gestiona todo el tráfico entrante de internet y lo distribuye a los servidores de aplicaciones. Utiliza un certificado SSL/TLS de AWS Certificate Manager (ACM).
 
-**Servidores de Aplicação (EC2):** Instâncias EC2 localizadas em sub-redes privadas para os seguintes microserviços:
+Servidores de aplicaciones (EC2): Instancias EC2 ubicadas en subredes privadas para los siguientes microservicios:
 
 - frontsite 
 - backoffice
 - webapi
 - gameapi
 
-### Bancos de Dados:
+### Bases de datos:
 
-**RDS (Transacional):** Na VPC Principal para as operações do dia a dia.
+RDS (Transaccional): En la VPC principal para las operaciones diarias.
 
-**RDS ou Redshift (Bodega de Dados):** Na VPC Secundária para dados históricos e análises.
+RDS o Redshift (Data Vault): En la VPC secundaria para datos históricos y análisis.
 
-**Cache:** Amazon ElastiCache for Redis para diminuir a latência e melhorar o desempenho das aplicações.
+Caché: Amazon ElastiCache para Redis para reducir la latencia y mejorar el rendimiento de las aplicaciones.
 
-### CDN e Armazenamento:
+### CDN y almacenamiento:
 
-**Amazon S3:** Para armazenar conteúdo estático como imagens e assets.
+Amazon S3: Para almacenar contenido estático, como imágenes y recursos.
 
-**Amazon CloudFront:** Atua como CDN para distribuir o conteúdo estático do S3 globalmente e com baixa latência.
+Amazon CloudFront: Actúa como CDN para distribuir contenido estático desde S3 globalmente y con baja latencia.
 
-## Destaques de Segurança
+## Aspectos destacados de seguridad
 
-A segurança é um pilar fundamental deste projeto, seguindo o princípio do menor privilégio.
+La seguridad es un pilar fundamental de este proyecto, siguiendo el principio del mínimo privilegio.
 
-**Isolamento de Rede:** Uso rigoroso de Security Groups e Network ACLs para isolar as camadas de balanceador, EC2, Redis e bancos de dados.
+**Aislamiento de red:** Uso estricto de grupos de seguridad y listas de control de acceso (ACL) de red para aislar las capas del balanceador de carga, EC2, Redis y la base de datos.
 
-**Acesso Privado ao S3:** O bucket S3 que armazena o conteúdo estático é configurado como privado. O acesso é permitido exclusivamente para o CloudFront através de um Origin Access Control (OAC), garantindo que o conteúdo não possa ser acessado diretamente.
+**Acceso privado a S3:** El bucket de S3 que almacena contenido estático está configurado como privado. El acceso se otorga exclusivamente a CloudFront a través del control de acceso de origen (OAC), lo que garantiza que no se pueda acceder directamente al contenido.
 
-**VPC Endpoints:** Para aumentar a segurança e reduzir custos de transferência de dados, foram implementados VPC Endpoints:
+**Puntos finales de VPC:** Para aumentar la seguridad y reducir los costos de transferencia de datos, se implementaron puntos finales de VPC:
 
-**Endpoint Gateway para S3:** Permite que as instâncias EC2 acessem o S3 sem passar pela internet pública.
+**Puerta de enlace de puntos finales para S3:** Permite que las instancias de EC2 accedan a S3 sin necesidad de acceder a la red pública de internet.
 
-**Endpoint Interface para Secrets Manager:** Garante que as credenciais e segredos sejam acessados de forma privada pelas aplicações.
+**Interfaz de punto final para Secrets Manager:** Garantiza que las aplicaciones accedan a las credenciales y los secretos de forma privada.
 
-**Criptografia:** O bucket S3 possui criptografia SSE-S3 habilitada para proteger os dados em repouso.
+**Cifrado:** El bucket de S3 tiene habilitado el cifrado SSE-S3 para proteger los datos en reposo.
 
-### Monitoramento e Logs
+### Monitoreo y Registros
 
-Para garantir a observabilidade e a capacidade de auditoria, a seguinte estrutura de monitoramento foi implementada:
+Para garantizar la observabilidad y auditabilidad, se implementó el siguiente marco de monitoreo:
 
-**CloudWatch Log Groups:** Grupos de logs centralizados para coletar logs das instâncias EC2 e das aplicações.
+Grupos de Registros de CloudWatch: Grupos de registros centralizados para recopilar registros de instancias y aplicaciones de EC2.
 
-**ALB Access Logs:** Os logs de acesso do Application Load Balancer são ativados e armazenados no S3 ou CloudWatch, permitindo a análise detalhada de todo o tráfego HTTP/HTTPS.
+Registros de Acceso ALB: Los registros de acceso del Balanceador de Carga de Aplicaciones (ALB) se habilitan y almacenan en S3 o CloudWatch, lo que permite un análisis detallado de todo el tráfico HTTP/HTTPS.
 
-## Estrutura do Projeto
+## Estructura del proyecto
 
-O código Terraform está organizado de forma modular para promover a reutilização e a fácil manutenção.
+El código de Terraform está organizado de forma modular para facilitar la reutilización y el mantenimiento.
 
 ```
 .
-├── main.tf           # Orquestra os módulos
-├── variables.tf      # Variáveis de entrada
-├── outputs.tf        # Saídas da infraestrutura
-├── network.tf        # Módulo de rede (VPCs, Sub-redes, etc.)
-├── instances.tf      # Módulo das instâncias EC2
-├── s3.tf             # Módulo do bucket S3
-├── cloudfront.tf     # Módulo da distribuição CloudFront
-├── endpoints.tf      # Módulo dos VPC Endpoints
-└── monitoring.tf     # Módulo de monitoramento (CloudWatch)
+├── main.tf          # Orquesta los módulos
+├── variables.tf     # Variables de entrada
+├── outputs.tf       # Salidas de infraestructura
+├── network.tf       # Módulo de red (VPC, subredes, etc.)
+├── instances.tf     # Módulo de instancias de EC2
+├── s3.tf            # Módulo de bucket de S3
+├── cloudfront.tf    # Módulo de distribución de CloudFront
+├── endpoints.tf     # Módulo de endpoints de VPC
+└── monitoring.tf    # Módulo de monitorización (CloudWatch)
 ```
 
-## Como Implantar a Infraestrutura
+## Cómo implementar la infraestructura
 
-**Pré-requisitos**
+**Requisitos previos**
 
-**Conta AWS:** Acesso a uma conta AWS com as permissões necessárias.
+**Cuenta de AWS:** Acceso a una cuenta de AWS con los permisos necesarios.
 
-**Terraform:** Terraform CLI instalado (versão 1.0.0 ou superior).
+**Terraform:** Terraform CLI instalado (versión 1.0.0 o superior).
 
-**AWS CLI:** AWS CLI instalado e configurado com suas credenciais (aws configure).
+**AWS CLI:** AWS CLI instalado y configurado con sus credenciales (aws configure).
 
-## Passos para a Implantação
+## Pasos de implementación
 
-Clonar o repositório:
+Clonar el repositorio:
 
 ```
 git clone https://github.com/haranakag/Casino-Online.git
 cd Casino-Online
 ```
-Inicializar o Terraform: Este comando inicializa o diretório de trabalho e baixa os provedores necessários.
+Inicializar Terraform: este comando inicializa el directorio de trabajo y descarga los proveedores necesarios.
 
 ```
 terraform init
 ```
 
-Planejar a implantação: O Terraform irá gerar um plano de execução mostrando quais recursos serão criados. É altamente recomendado revisar este plano antes de aplicar.
+Planifique la implementación: Terraform generará un plan de ejecución que muestra los recursos que se crearán. Se recomienda revisar este plan antes de aplicar.
 
 ```
 terraform plan
 ```
 
-Aplicar as configurações: Este comando provisionará todos os recursos definidos nos arquivos .tf.
+Aplicar configuración: este comando aprovisionará todos los recursos definidos en los archivos .tf.
 
 ```
 terraform apply
 ```
 
-Digite yes quando solicitado para confirmar a criação da infraestrutura.
+Escriba "Yes" cuando se le solicite para confirmar la creación de la infraestructura.
 
-Destruir a infraestrutura: Para remover todos os recursos criados por este projeto e evitar custos, execute:
+Destruir la infraestructura: Para eliminar todos los recursos creados por este proyecto y evitar costos, ejecute:
 
 ```
 terraform destroy
 ```
 
-## Entregáveis Adicionais
+## Entregables adicionales
 
-Conforme solicitado no desafio, este projeto inclui:
+Como se solicitó en el desafío, este proyecto incluye:
 
-**Código Terraform Completo:** Todos os arquivos .tf necessários para provisionar a infraestrutura.
+**Código Terraform completo:** Todos los archivos .tf necesarios para aprovisionar la infraestructura.
 
-**Diagrama de Arquitetura:** O diagrama visualiza todos os componentes descritos, incluindo as VPCs, o peering, os serviços e os fluxos de comunicação.
+**Diagrama de arquitectura:** El diagrama visualiza todos los componentes descritos, incluyendo VPC, peering, servicios y flujos de comunicación.
 
-**Estimativa de Custos Mensal:** Uma análise detalhada dos custos mensais estimados para a execução desta infraestrutura na AWS, com base nos serviços provisionados.
+**Estimación de costo mensual:** Un desglose detallado de los costos mensuales estimados para ejecutar esta infraestructura en AWS, según los servicios aprovisionados.

@@ -4,6 +4,7 @@ Este repositório contém o código Terraform para provisionar a infraestrutura 
 
 ## Visão Geral da Arquitetura
 
+![Arquitetura](Reto%20Ingeniero%20Cloud.drawio.png)
 A infraestrutura foi projetada para ser robusta e segura, utilizando uma arquitetura de microserviços distribuída em múltiplas Zonas de Disponibilidade (AZs) para garantir alta disponibilidade.
 
 ### Os componentes principais da arquitetura são:

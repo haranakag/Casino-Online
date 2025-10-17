@@ -143,4 +143,4 @@ Como se solicitó en el desafío, este proyecto incluye:
 
 **Diagrama de arquitectura:** El diagrama visualiza todos los componentes descritos, incluyendo VPC, peering, servicios y flujos de comunicación.
 
-**Estimación de costo mensual:** Un desglose detallado de los costos mensuales estimados para ejecutar esta infraestructura en AWS, según los servicios aprovisionados.
+**[Estimación de costo mensual:](Costos.md)** Un desglose detallado de los costos mensuales estimados para ejecutar esta infraestructura en AWS, según los servicios aprovisionados.
